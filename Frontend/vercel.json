@@ -1,8 +1,0 @@
-{
-    "require": [
-        {
-            "source": "/(.*)",
-            "destination": "/"
-        }
-    ]
-}

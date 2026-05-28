@@ -2,6 +2,9 @@
 Backend/venv/
 Backend/.env
 Backend/portfolio.db
+Backend/portfolio.db-shm
+Backend/portfolio.db-wal
+Backend/portfolio.db-journal
 Backend/__pycache__/
 Backend/app/__pycache__/
 Backend/app/services/__pycache__/

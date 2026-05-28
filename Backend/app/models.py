@@ -1,24 +1,31 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
-from app.database import Base
+from sqlalchemy import String, Text, DateTime, Boolean
+from sqlalchemy.orm import Mapped, mapped_column
+from app.core.database import Base
 
 class User(Base):
+    """
+    SQLAlchemy model representing the administrative User table.
+    """
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class Submission(Base):
+    """
+    SQLAlchemy model representing the client contact Submission table.
+    """
     __tablename__ = "submissions"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False)
-    email = Column(String(255), nullable=False)
-    phone = Column(String(20), nullable=False)
-    description = Column(Text, nullable=False)
-    status = Column(String(20), default="new")  # Status states: "new", "urgent", "read"
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="new")  # Status states: "new", "urgent", "read"
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

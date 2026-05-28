@@ -1,7 +1,10 @@
+import logging
 from sqlalchemy.orm import Session
 from app.models import User
-from app.auth import verify_password, hash_password
-from app.config import settings
+from app.core.security import verify_password, hash_password
+from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 def authenticate_user(db: Session, email: str, password: str) -> bool:
     """
@@ -9,9 +12,15 @@ def authenticate_user(db: Session, email: str, password: str) -> bool:
     """
     user = db.query(User).filter(User.email == email).first()
     if not user:
+        logger.warning(f"Authentication failed: No user found with email '{email}'")
         return False
-    if not verify_password(password, user.hashed_password):
+        
+    result = verify_password(password, user.hashed_password)
+    if not result:
+        logger.warning(f"Authentication failed: Incorrect password for user '{email}'")
         return False
+        
+    logger.info(f"User '{email}' successfully authenticated.")
     return True
 
 def create_default_admin(db: Session):
@@ -30,6 +39,6 @@ def create_default_admin(db: Session):
         db.add(default_admin)
         db.commit()
         db.refresh(default_admin)
-        print(f"[Startup] Default admin user created successfully: {admin_email}")
+        logger.info(f"Default admin user created successfully: {admin_email}")
     else:
-        print(f"[Startup] Admin user already exists: {admin_email}")
+        logger.info(f"Admin user validation: default admin already exists.")

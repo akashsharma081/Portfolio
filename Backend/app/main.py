@@ -1,12 +1,19 @@
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from app.database import Base, engine, SessionLocal
-from app.config import settings
+
+from app.core.logging import setup_logging
+from app.core.database import Base, engine, SessionLocal
+from app.core.config import settings
 from app.services.auth_service import create_default_admin
 from app.routers import auth, submissions
+
+# Setup standard application-wide logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -14,6 +21,7 @@ async def lifespan(app: FastAPI):
     Handles application startup and shutdown lifespan events.
     Creates SQLite database tables and seeds default admin credentials.
     """
+    logger.info("Application lifespan startup initiated. Verifying database tables...")
     # Create SQLite database tables if they do not exist
     Base.metadata.create_all(bind=engine)
     
@@ -21,9 +29,14 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         create_default_admin(db)
+    except Exception as e:
+        logger.error(f"Error during default admin creation: {e}", exc_info=True)
     finally:
         db.close()
+    
+    logger.info("Lifespan setup complete. Application is ready to handle requests.")
     yield
+    logger.info("Application shutdown initiated.")
 
 # Initialize FastAPI App
 app = FastAPI(
@@ -62,6 +75,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
                 msg = msg.replace("value_error.", "")
             errors[field] = msg
             
+    logger.warning(f"Request validation failure on path '{request.url.path}': {errors}")
     return JSONResponse(
         status_code=422,
         content={

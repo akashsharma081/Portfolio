@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
 class Settings(BaseSettings):
+    """
+    Application settings configuration loaded from environment variables or .env file.
+    """
     DATABASE_URL: str = "sqlite:///./portfolio.db"
     SECRET_KEY: str = "9aefb23184cd761f22e84ab4b6da978bf4c15371ad52b31f7c5e2ff71804b402"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60

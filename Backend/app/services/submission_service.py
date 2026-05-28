@@ -1,8 +1,11 @@
+import logging
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import List, Optional
 from app.models import Submission
 from app.schemas import SubmissionCreate, SubmissionUpdate
+
+logger = logging.getLogger(__name__)
 
 def create_submission(db: Session, submission_data: SubmissionCreate) -> Submission:
     """
@@ -18,6 +21,7 @@ def create_submission(db: Session, submission_data: SubmissionCreate) -> Submiss
     db.add(db_submission)
     db.commit()
     db.refresh(db_submission)
+    logger.info(f"Successfully recorded new submission ID {db_submission.id} from {submission_data.email}")
     return db_submission
 
 def get_submissions(db: Session, search: Optional[str] = None, status: Optional[str] = None) -> List[Submission]:
@@ -57,6 +61,7 @@ def update_submission(db: Session, submission_id: int, submission_data: Submissi
     """
     db_submission = get_submission_by_id(db, submission_id)
     if not db_submission:
+        logger.warning(f"Failed to update: Submission ID {submission_id} does not exist")
         return None
         
     update_dict = submission_data.model_dump(exclude_unset=True)
@@ -70,6 +75,7 @@ def update_submission(db: Session, submission_id: int, submission_data: Submissi
         
     db.commit()
     db.refresh(db_submission)
+    logger.info(f"Successfully updated submission ID {submission_id}")
     return db_submission
 
 def delete_submission(db: Session, submission_id: int) -> bool:
@@ -78,7 +84,9 @@ def delete_submission(db: Session, submission_id: int) -> bool:
     """
     db_submission = get_submission_by_id(db, submission_id)
     if not db_submission:
+        logger.warning(f"Failed to delete: Submission ID {submission_id} does not exist")
         return False
     db.delete(db_submission)
     db.commit()
+    logger.info(f"Successfully deleted submission ID {submission_id} from database")
     return True

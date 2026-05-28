@@ -1,0 +1,26 @@
+# Virtual environment
+Backend/venv/
+Backend/.env
+Backend/portfolio.db
+Backend/__pycache__/
+Backend/app/__pycache__/
+Backend/app/services/__pycache__/
+Backend/app/routers/__pycache__/
+
+# Frontend Node modules and builds
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.env
+Frontend/.env.local
+Frontend/.env.development.local
+Frontend/.env.test.local
+Frontend/.env.production.local
+Frontend/npm-debug.log*
+Frontend/yarn-debug.log*
+Frontend/yarn-error.log*
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
